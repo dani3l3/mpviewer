@@ -129,7 +129,7 @@ namespace MPViewer
             m_dataset.Tables.Add(table);
 
             table.Columns.Add("Name", Type.GetType("System.String"));
-            table.Columns.Add("Target", Type.GetType("System.String"));
+            table.Columns.Add("Class", Type.GetType("System.String"));
             table.Columns.Add("Algorithm", Type.GetType("System.String"));
             table.Columns.Add("Category", Type.GetType("System.String"));
             table.Columns.Add("Enabled", Type.GetType("System.Boolean"));
@@ -137,6 +137,9 @@ namespace MPViewer
             table.Columns.Add("Alert Severity", Type.GetType("System.String"));
             table.Columns.Add("Alert Priority", Type.GetType("System.String"));
             table.Columns.Add("Auto Resolve", Type.GetType("System.String"));
+            table.Columns.Add("Alert on State", Type.GetType("System.String"));
+            table.Columns.Add("Alert Description", Type.GetType("System.String"));
+            table.Columns.Add("Alert Name", Type.GetType("System.String"));
             table.Columns.Add("Remotable", Type.GetType("System.Boolean"));
             table.Columns.Add("Accessibility", Type.GetType("System.String"));
             table.Columns.Add("Description", Type.GetType("System.String"));
@@ -170,13 +173,16 @@ namespace MPViewer
             row["Name"]     = Utilities.GetBestMPElementName(monitor);
             row["Category"] = monitor.Category.ToString();
             row["Enabled"]  = (monitor.Enabled != ManagementPackMonitoringLevel.@false);
-            row["Target"]   = AttempToResolveName(monitor.Target);
+            row["Class"]   = AttempToResolveName(monitor.Target);
 
             if (monitor.AlertSettings == null)
             {
                 row["Generate Alert"]   = false;
                 row["Alert Severity"]   = string.Empty;
                 row["Auto Resolve"]     = string.Empty;
+                row["Alert on State"] = string.Empty;
+                row["Alert Description"] = string.Empty;
+                row["Alert Name"] = string.Empty;
             }
             else
             {
@@ -184,6 +190,12 @@ namespace MPViewer
                 row["Alert Severity"]   = monitor.AlertSettings.AlertSeverity.ToString();
                 row["Alert Priority"]   = monitor.AlertSettings.AlertPriority.ToString();
                 row["Auto Resolve"]     = monitor.AlertSettings.AutoResolve.ToString();
+                //get alert settings
+                row["Alert on State"] = monitor.AlertSettings.AlertOnState.ToString();
+
+                string alertName = (monitor.AlertSettings.AlertMessage.GetElement() as ManagementPackStringResource).Description;
+                row["Alert Description"] = alertName;//monitor.AlertSettings.AlertMessage.Name;
+                row["Alert Name"] = (monitor.AlertSettings.AlertMessage.GetElement() as ManagementPackStringResource).DisplayName;
             }
 
             row["Remotable"]        = monitor.Remotable;
@@ -200,18 +212,21 @@ namespace MPViewer
             m_dataset.Tables.Add(table);
 
             table.Columns.Add("Name", Type.GetType("System.String"));
-            table.Columns.Add("Target", Type.GetType("System.String"));
-            table.Columns.Add("Algorithm", Type.GetType("System.String"));
-            table.Columns.Add("Algorithm Parameter", Type.GetType("System.String"));
-            table.Columns.Add("Source Monitor", Type.GetType("System.String"));
-            table.Columns.Add("Relationship", Type.GetType("System.String"));
+            table.Columns.Add("Class", Type.GetType("System.String"));
             table.Columns.Add("Category", Type.GetType("System.String"));
+            table.Columns.Add("Algorithm", Type.GetType("System.String"));
             table.Columns.Add("Enabled", Type.GetType("System.Boolean"));
             table.Columns.Add("Generate Alert", Type.GetType("System.Boolean"));
+            table.Columns.Add("Alert on State", Type.GetType("System.String"));
+            table.Columns.Add("Alert Name", Type.GetType("System.String"));
             table.Columns.Add("Alert Severity", Type.GetType("System.String"));
             table.Columns.Add("Alert Priority", Type.GetType("System.String"));
+            table.Columns.Add("Alert Description", Type.GetType("System.String"));
             table.Columns.Add("Auto Resolve", Type.GetType("System.String"));
+            table.Columns.Add("Unit Monitor", Type.GetType("System.String"));
+            table.Columns.Add("Relationship", Type.GetType("System.String"));
             table.Columns.Add("Remotable", Type.GetType("System.Boolean"));
+            table.Columns.Add("Algorithm Parameter", Type.GetType("System.String"));
             table.Columns.Add("Accessibility", Type.GetType("System.String"));
             table.Columns.Add("Description", Type.GetType("System.String"));
             table.Columns.Add("ObjectRef");
@@ -229,7 +244,7 @@ namespace MPViewer
 
                 row["Algorithm"]            = ((ManagementPackDependencyMonitor)monitor).Algorithm.ToString();
                 row["Algorithm Parameter"]  = ((ManagementPackDependencyMonitor)monitor).AlgorithmParameter;
-                row["Source Monitor"]       = AttempToResolveName(((ManagementPackDependencyMonitor)monitor).MemberMonitor);
+                row["Unit Monitor"]       = AttempToResolveName(((ManagementPackDependencyMonitor)monitor).MemberMonitor);
                 row["Relationship"]         = AttempToResolveName(((ManagementPackDependencyMonitor)monitor).RelationshipType);
 
                 table.Rows.Add(row);
@@ -244,7 +259,7 @@ namespace MPViewer
             m_dataset.Tables.Add(table);
 
             table.Columns.Add("Name", Type.GetType("System.String"));
-            table.Columns.Add("Target", Type.GetType("System.String"));
+            table.Columns.Add("Class", Type.GetType("System.String"));
             table.Columns.Add("Application", Type.GetType("System.String"));
             table.Columns.Add("WorkingDirectory", Type.GetType("System.String"));
             table.Columns.Add("Require Output", Type.GetType("System.Boolean"));
@@ -257,10 +272,10 @@ namespace MPViewer
                 DataRow row = table.NewRow();
 
                 row["Name"]             = Common.Utilities.GetBestMPElementName(task);
-                row["Target"]           = AttempToResolveName(task.Target);
+                row["Class"]           = AttempToResolveName(task.Target);
                 row["Accessibility"]    = task.Accessibility;
-                row["Application"]      = task.Application;
-                row["WorkingDirectory"] = task.WorkingDirectory;
+                //row["Application"]      = task.Application;
+                //row["WorkingDirectory"] = task.WorkingDirectory;
                 row["Require Output"]   = task.RequireOutput;
                 row["Description"]      = task.Description;
                 row["ObjectRef"]        = task.Name;
@@ -312,7 +327,7 @@ namespace MPViewer
 
             table.Columns.Add("Name", Type.GetType("System.String"));
             table.Columns.Add("Accessibility", Type.GetType("System.String"));
-            //table.Columns.Add("Target", Type.GetType("System.String"));
+            //table.Columns.Add("Class", Type.GetType("System.String"));
             table.Columns.Add("Description", Type.GetType("System.String"));
             table.Columns.Add("ObjectRef");
 
@@ -323,7 +338,7 @@ namespace MPViewer
 
                 row["Name"] = Common.Utilities.GetBestMPElementName(componentType);
                 row["Accessibility"] = componentType.Accessibility;
-                //row["Target"] = componentType.Target; // is this string here good enough? it uses the mpelement:// syntax...
+                //row["Class"] = componentType.Target; // is this string here good enough? it uses the mpelement:// syntax...
                 row["Description"] = componentType.Description;
                 row["ObjectRef"] = componentType.Name;
 
@@ -340,7 +355,7 @@ namespace MPViewer
             m_dataset.Tables.Add(table);
 
             table.Columns.Add("Name", Type.GetType("System.String"));
-            table.Columns.Add("Target", Type.GetType("System.String"));
+            table.Columns.Add("Class", Type.GetType("System.String"));
             table.Columns.Add("Type", Type.GetType("System.String"));
             table.Columns.Add("Accessibility", Type.GetType("System.String"));
             table.Columns.Add("Visible", Type.GetType("System.Boolean"));                        
@@ -352,7 +367,7 @@ namespace MPViewer
                 DataRow row = table.NewRow();
 
                 row["Name"]             = Common.Utilities.GetBestMPElementName(view);
-                row["Target"]           = AttempToResolveName(view.Target);
+                row["Class"]           = AttempToResolveName(view.Target);
                 row["Accessibility"]    = view.Accessibility;
                 row["Visible"]          = view.Visible;
                 row["Description"]      = view.Description;
@@ -562,7 +577,7 @@ namespace MPViewer
             m_dataset.Tables.Add(table);
 
             table.Columns.Add("Name", Type.GetType("System.String"));
-            table.Columns.Add("Target", Type.GetType("System.String"));
+            table.Columns.Add("Class", Type.GetType("System.String"));
             table.Columns.Add("Monitor Name", Type.GetType("System.String"));
             table.Columns.Add("Remotable", Type.GetType("System.Boolean"));
             table.Columns.Add("Timeout", Type.GetType("System.String"));
@@ -575,7 +590,7 @@ namespace MPViewer
                 DataRow row = table.NewRow();
 
                 row["Name"]             = Utilities.GetBestMPElementName(diagnostic);
-                row["Target"]           = AttempToResolveName(diagnostic.Target);
+                row["Class"]           = AttempToResolveName(diagnostic.Target);
                 row["Monitor Name"]     = diagnostic.Monitor.Name;
                 row["Remotable"]        = diagnostic.Remotable;
                 row["Timeout"]          = diagnostic.Timeout.ToString();
@@ -595,7 +610,7 @@ namespace MPViewer
             m_dataset.Tables.Add(table);
 
             table.Columns.Add("Name", Type.GetType("System.String"));
-            table.Columns.Add("Target", Type.GetType("System.String"));
+            table.Columns.Add("Class", Type.GetType("System.String"));
             table.Columns.Add("Monitor Name", Type.GetType("System.String"));
             table.Columns.Add("Reset Monitor", Type.GetType("System.Boolean"));
             table.Columns.Add("Remotable", Type.GetType("System.Boolean"));
@@ -608,7 +623,7 @@ namespace MPViewer
                 DataRow row = table.NewRow();
 
                 row["Name"]             = Utilities.GetBestMPElementName(recovery);
-                row["Target"]           = AttempToResolveName(recovery.Target);
+                row["Class"]           = AttempToResolveName(recovery.Target);
                 row["Monitor Name"]     = recovery.Monitor.Name;
                 row["Reset Monitor"]    = recovery.ResetMonitor;
                 row["Remotable"]        = recovery.Remotable;
@@ -629,7 +644,7 @@ namespace MPViewer
 
             table.Columns.Add("Name", Type.GetType("System.String"));            
             table.Columns.Add("Source", Type.GetType("System.String"));
-            table.Columns.Add("Target", Type.GetType("System.String"));
+            table.Columns.Add("Class", Type.GetType("System.String"));
             table.Columns.Add("Type", Type.GetType("System.String"));
             table.Columns.Add("Description", Type.GetType("System.String"));
             table.Columns.Add("ObjectRef");
@@ -640,7 +655,7 @@ namespace MPViewer
 
                 row["Name"]         = Utilities.GetBestMPElementName(relationship);
                 row["Source"] = AttempToResolveName(relationship.Source.Type);
-                row["Target"] = AttempToResolveName(relationship.Target.Type);
+                row["Class"] = AttempToResolveName(relationship.Target.Type);
                 row["Type"]         = relationship.Base.Name;
                 row["Description"]  = relationship.Description;
                 row["ObjectRef"]    = relationship.Name;
@@ -713,17 +728,20 @@ namespace MPViewer
             m_dataset.Tables.Add(table);
 
             table.Columns.Add("Name", Type.GetType("System.String"));
-            table.Columns.Add("Target", Type.GetType("System.String"));
+            table.Columns.Add("Class", Type.GetType("System.String"));
             table.Columns.Add("Category", Type.GetType("System.String"));
             table.Columns.Add("Enabled", Type.GetType("System.Boolean"));
+            table.Columns.Add("Generate Alert", Type.GetType("System.Boolean"));
+            table.Columns.Add("Alert on State", Type.GetType("System.String"));
+            table.Columns.Add("Alert Name", Type.GetType("System.String"));
+            table.Columns.Add("Alert Severity", Type.GetType("System.String"));
+            table.Columns.Add("Alert Priority", Type.GetType("System.String"));
+            table.Columns.Add("Alert Description", Type.GetType("System.String"));
+            table.Columns.Add("Auto Resolve", Type.GetType("System.String"));
+            table.Columns.Add("MonitorType", Type.GetType("System.String"));
             table.Columns.Add("Object Name", Type.GetType("System.String"));
             table.Columns.Add("Counter Name", Type.GetType("System.String"));
             table.Columns.Add("Frequency", Type.GetType("System.String"));
-            table.Columns.Add("Generate Alert", Type.GetType("System.Boolean"));
-            table.Columns.Add("Alert Severity", Type.GetType("System.String"));
-            table.Columns.Add("Alert Priority", Type.GetType("System.String"));
-            table.Columns.Add("Auto Resolve", Type.GetType("System.String"));
-            table.Columns.Add("MonitorType", Type.GetType("System.String"));
             table.Columns.Add("Remotable", Type.GetType("System.Boolean"));
             table.Columns.Add("Accessibility", Type.GetType("System.String"));
             table.Columns.Add("Description", Type.GetType("System.String"));
@@ -812,7 +830,7 @@ namespace MPViewer
             m_dataset.Tables.Add(table);
 
             table.Columns.Add("Name", Type.GetType("System.String"));
-            table.Columns.Add("Target", Type.GetType("System.String"));
+            table.Columns.Add("Class", Type.GetType("System.String"));
             table.Columns.Add("Category", Type.GetType("System.String"));
             table.Columns.Add("Enabled", Type.GetType("System.Boolean"));
             table.Columns.Add("Object Name", Type.GetType("System.String"));
@@ -838,7 +856,7 @@ namespace MPViewer
                 row["Category"]     = rule.Category.ToString();
                 row["Enabled"]      = (rule.Enabled != ManagementPackMonitoringLevel.@false);
                 row["ObjectRef"]    = rule.Name;
-                row["Target"]       = AttempToResolveName(rule.Target);
+                row["Class"]       = AttempToResolveName(rule.Target);
 
                 ExtractAlertGenerationInfo(rule, row);
                 ExtractPerfCounterInfo(rule, row);
@@ -1322,7 +1340,7 @@ namespace MPViewer
             m_dataset.Tables.Add(table);
 
             table.Columns.Add("Name", Type.GetType("System.String"));
-            table.Columns.Add("Target", Type.GetType("System.String"));
+            table.Columns.Add("Class", Type.GetType("System.String"));
             table.Columns.Add("Enabled", Type.GetType("System.Boolean"));
             table.Columns.Add("Frequency", Type.GetType("System.String"));
             table.Columns.Add("Remotable", Type.GetType("System.Boolean"));
@@ -1338,7 +1356,7 @@ namespace MPViewer
                 row["Frequency"]    = RetrieveDiscoveryFrequency(discovery);
                 row["Description"]  = discovery.Description;
                 row["ObjectRef"]    = discovery.Name;
-                row["Target"]       = AttempToResolveName(discovery.Target);
+                row["Class"]       = AttempToResolveName(discovery.Target);
                 row["Remotable"]    = discovery.Remotable;
 
                 table.Rows.Add(row);
@@ -1367,7 +1385,7 @@ namespace MPViewer
 
             if (hasTarget)
             {
-                table.Columns.Add("Target", Type.GetType("System.String"));
+                table.Columns.Add("Class", Type.GetType("System.String"));
             }
             
             table.Columns.Add("ObjectRef");
@@ -1382,33 +1400,33 @@ namespace MPViewer
                 if (element is ManagementPackRecovery)
                 {
                     row["Remotable"] = ((ManagementPackRecovery)(ManagementPackElement)element).Remotable;
-                    row["Target"] = AttempToResolveName(((ManagementPackRecovery)(ManagementPackElement)element).Target);
+                    row["Class"] = AttempToResolveName(((ManagementPackRecovery)(ManagementPackElement)element).Target);
                 }
                 else if (element is ManagementPackDiagnostic)
                 {
                     row["Remotable"] = ((ManagementPackDiagnostic)(ManagementPackElement)element).Remotable;
-                    row["Target"] = AttempToResolveName(((ManagementPackDiagnostic)(ManagementPackElement)element).Target);
+                    row["Class"] = AttempToResolveName(((ManagementPackDiagnostic)(ManagementPackElement)element).Target);
                 }
                 else if (element is ManagementPackTask)
                 {
                     row["Remotable"] = ((ManagementPackTask)(ManagementPackElement)element).Remotable;
-                    row["Target"] = AttempToResolveName(((ManagementPackTask)(ManagementPackElement)element).Target);
+                    row["Class"] = AttempToResolveName(((ManagementPackTask)(ManagementPackElement)element).Target);
                 }
                 else if (element is ManagementPackLinkedReport)
                 {
-                    row["Target"] = AttempToResolveName(((ManagementPackLinkedReport)(ManagementPackElement)element).Target);
+                    row["Class"] = AttempToResolveName(((ManagementPackLinkedReport)(ManagementPackElement)element).Target);
                 }
                 else if (element is ManagementPackReport)
                 {
-                    row["Target"] = AttempToResolveName(((ManagementPackReport)(ManagementPackElement)element).Target);
+                    row["Class"] = AttempToResolveName(((ManagementPackReport)(ManagementPackElement)element).Target);
                 }
                 else if (element is ManagementPackConsoleTask)
                 {
-                    row["Target"] = AttempToResolveName(((ManagementPackConsoleTask)(ManagementPackElement)element).Target);
+                    row["Class"] = AttempToResolveName(((ManagementPackConsoleTask)(ManagementPackElement)element).Target);
                 }
                 else if (element is ManagementPackView)
                 {
-                    row["Target"] = AttempToResolveName(((ManagementPackView)(ManagementPackElement)element).Target);
+                    row["Class"] = AttempToResolveName(((ManagementPackView)(ManagementPackElement)element).Target);
                 }
 
                 row["ObjectRef"]    = element.Name;
